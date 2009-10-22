@@ -1,0 +1,1 @@
+Run the resolve task first and refresh.  Then the Eclipse will find the required libraries in lib.
