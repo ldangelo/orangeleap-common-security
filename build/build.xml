@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="orangeleap-common-security" basedir=".." default="jar">
+
+	<property file="${basedir}/build/build.properties" />
+	<property file="${commonBuild.dir}/commonBuild.properties"/>
+	<property name="build.env" value="dev"/>
+	<property name="dist.dir" value="${basedir}/dist"/>
+	<tstamp prefix="build" />
+
+	<import file="${commonBuild.dir}/ivyBuild.xml"/>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${antcontrib.jar}" />
+		</classpath>
+	</taskdef>
+
+	<target name="compile" depends="resolve" >
+		<delete dir="${classes.dir}" />
+		<mkdir dir="${classes.dir}" />
+		
+		<echo>Compiling with debug=${debug.compile}</echo>
+		<javac destdir="${classes.dir}" srcdir="${src.dir}" memoryInitialSize="128m" memoryMaximumSize="1024m" fork="true"
+			debug="${debug.compile}" classpathref="compile.path"/> <!-- compile.path is set in ivyBuild.xml -->
+	</target>
+
+	<target name="jar" depends="compile" >
+		<mkdir dir="${stage.dir}" />
+		<mkdir dir="${stage.dir}/classes-jar" />
+		<mkdir dir="${dist.dir}" />
+		
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.*" />
+				<exclude name="**/*.java" />
+			</fileset>
+			<fileset dir="${config.dir}">
+				<include name="**/*.properties" />
+				<include name="**/*.xml" />
+			</fileset>
+		</copy>
+
+		<jar jarfile="${stage.dir}/${app.name}-${app.version}.jar" basedir="${classes.dir}">
+			<include name="**/*.class" />
+			<include name="**/*.properties" />
+			<include name="**/*.xml" />
+		</jar>
+		
+		<copy todir="${dist.dir}" file="${stage.dir}/${app.name}-${app.version}.jar" />
+		
+		
+	</target>
+
+
+</project>
