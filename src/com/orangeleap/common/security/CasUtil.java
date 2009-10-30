@@ -34,7 +34,38 @@ import org.springframework.security.ui.cas.CasProcessingFilter;
 import com.jaspersoft.jasperserver.irplugin.JServer;
 
 public class CasUtil {
-	
+	public static void populateOrageLeapAuthenticationWithCasCredentials(OrangeLeapAuthentication auth, String baseUrl) {
+        Authentication authentication = (Authentication) SecurityContextHolder.getContext().getAuthentication();
+
+		if (authentication instanceof UsernamePasswordAuthenticationToken) {
+			
+			// LDAP authenticated
+			// Use username and password to login to target service
+			
+			Map<String, Object> info = OrangeLeapUsernamePasswordLocal.getOrangeLeapAuthInfo();
+			String site = (String)info.get(OrangeLeapUsernamePasswordLocal.SITE);
+			String username = (String)info.get(OrangeLeapUsernamePasswordLocal.USER_NAME);
+			String password = (String)info.get(OrangeLeapUsernamePasswordLocal.PASSWORD);
+
+			auth.setUserName(username+"@"+site);
+			auth.setPassword(password);
+			
+		} else if (authentication instanceof CasAuthenticationToken) {
+			
+	    	// CAS login
+	    	// CasAuthenticationProvider can use key for username and password for (proxy) ticket
+			
+			auth.setUserName(CasProcessingFilter.CAS_STATELESS_IDENTIFIER);
+			auth.setPassword(getProxyTicketFor(baseUrl)); 
+			
+		} else if (authentication instanceof OrangeLeapSystemAuthenticationToken) {
+
+			auth.setUserName(""+authentication.getPrincipal());
+			auth.setPassword(""+authentication.getCredentials()); 
+
+		}
+	}
+
 	public static void populateJserverWithCasCredentials(JServer jserver, String baseUrl) {
 		
         Authentication authentication = (Authentication) SecurityContextHolder.getContext().getAuthentication();
