@@ -113,10 +113,9 @@ public class CasUtil {
     public static String getProxyTicketFor(String baseUrl) {
 		Authentication token = getAuthenticationToken();
 		if (token == null) return null;
-		String serviceUrl = baseUrl + "/j_acegi_cas_security_check";
+		String serviceUrl = baseUrl;
 		return ((CasAuthenticationToken)token).getAssertion().getPrincipal().getProxyTicketFor(serviceUrl);
     }
-
 
 
 }
